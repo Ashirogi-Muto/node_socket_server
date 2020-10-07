@@ -11,6 +11,7 @@ const smembersAsync = promisify(redisClient.SMEMBERS).bind(redisClient)
 const {
 	MESSAGE_PREFIX,
 	ROOM_LIST_KEY,
+	ROOM_PREFIX,
 	USER_ROOMS_PREFIX,
 } = require('../utils/constants')
 
@@ -32,8 +33,18 @@ const addMessage = async ({ text, chatRoomId, senderId, id, timestamp }) => {
 			'id', id, 
 			'timestamp', timestamp
 		]
-		const key = `${MESSAGE_PREFIX}${chatRoomId}`
+		const key = `${MESSAGE_PREFIX}${id}`
 		return await hmsetAsync(key , messageData)
+	} catch (error) {
+		throw error
+	}
+}
+
+const addMessageIdToRoomMessageList = async (roomId, messageId) => {
+	try {
+		const key = `${MESSAGE_PREFIX}${roomId}`
+		console.log('addMessageIdToRoomMessageList KEY', key);
+		await lpushAsync(key, messageId)
 	} catch (error) {
 		throw error
 	}
@@ -93,16 +104,29 @@ const addUserToUserRoomList = async (userId, roomKey) => {
 
 /**
  * 
- * @param {String} id User Id
- * @returns {Object} user
+ * @param {String} roomId 
+ * @returns {Array} allMessages
+ * @throws Error
  */
-const fetchUser = async id => {
+const fetchAllMessages = async roomId => {
 	try {
-		const user = await hgetallAsync(`${USER_PREFIX}${id}`)
+		if(!roomId) {
+			throw new Error('Input room id is missing')
+		}
+		const roomMessageListkey = `${MESSAGE_PREFIX}${roomId}`
+		const roomMessageIds = await lrangeAsync(roomMessageListkey, 0, -1)
+		console.log(roomMessageIds);
+		if(roomMessageIds.length > 0) {
+			const fetchMessagesPromise = roomMessageIds.map(id => {
+				const messageKey = `${MESSAGE_PREFIX}${id}`
+				return hgetallAsync(messageKey)
+			})
+			return await Promise.all(fetchMessagesPromise)
+		}
+		return []
 	} catch (error) {
 		throw error
 	}
-	
 }
 
 /**
@@ -124,12 +148,28 @@ const fetchAllRooms = async () => {
 	}
 }
 
+/**
+ * 
+ * @param {String} id User Id
+ * @returns {Object} user
+ */
+const fetchUser = async id => {
+	try {
+		const user = await hgetallAsync(`${USER_PREFIX}${id}`)
+	} catch (error) {
+		throw error
+	}
+	
+}
+
 
 module.exports = {
 	addMessage,
+	addMessageIdToRoomMessageList,
 	addRoom,
 	addRoomKeyInRoomList,
 	addUserToUserRoomList,
+	fetchAllMessages,
 	fetchAllRooms,
 	fetchUser
 }

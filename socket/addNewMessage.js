@@ -1,6 +1,11 @@
 const {
-	addMessage
+	addMessage,
+	addMessageIdToRoomMessageList
 } = require('../redis')
+
+const {
+	getFormattedLocalTimestamp
+} = require('../utils/momentHelper')
 
 /**
  * 
@@ -9,13 +14,15 @@ const {
  * @param {String} messageParams.senderId Message sender i.e. user ID
  * @param {String} messageParams.id Message ID
  * @param {String} messageParams.timestamp Message Sent Timestamp
- * @param {Object} socket Socket Object
+ * @throws Error
  */
-const addNewMessage = ({ text, chatRoomId, senderId, id, timestamp }, socket) => {
+const addNewMessage = async ({ text, chatRoomId, senderId, id }) => {
 	try {
-		await addMessage({ text, chatRoomId, senderId, id, timestamp })
-		socket.to(chatRoomId).emit('newMessage', { text, chatRoomId, senderId, id, timestamp })
+		await addMessage({ text, chatRoomId, senderId, id, timestamp: getFormattedLocalTimestamp() })
+		await addMessageIdToRoomMessageList(chatRoomId, id)
 	} catch (error) {
 		throw error
 	}
 }
+
+module.exports = addNewMessage

@@ -63,21 +63,34 @@
 	<br/>
 	<br/>
 	<br/>
-
 	<button id="seeRooms">See All Rooms</button>
+	<button id="fetchAllMessages">Fetch All Messages</button>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+
 	<ul id="messages"></ul>
-	<form action="">
-		<input id="m" autocomplete="off" /><button>Send</button>
-	</form>
+	<input id="message" autocomplete="off" />
+	<button id="sendMessage">Send</button>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 	$(document).ready(() => {
 		const socket = io()
+
+		socket.on('receiveNewMessage', data => {
+			console.log('NEW MESSAGE', data);
+		})
+
+
 		const newRoomButton = $('#newRoom')
 		const testRoomButton = $('#testNewRoom')
-		const seeAlRoomsButton = $('#seeRooms')
+		const seeAllRoomsButton = $('#seeRooms')
+		const sendNewMessage = $('#sendMessage')
+		const fetchAllMessages = $('#fetchAllMessages')
+
 		newRoomButton.click(() => {
 			console.log('NEW ROOM EMIT');
 			socket.emit('newRoom', { name: 'FIT5042', tag: 'unit', userId: 'kpan0021@student.monash.edu' })
@@ -85,8 +98,23 @@
 		testRoomButton.click(() => {
 			console.log('TEST ROOM EMIT');
 		})
-		seeAlRoomsButton.click(() => {
+		seeAllRoomsButton.click(() => {
 			socket.emit('seeAllRooms')
+		})
+		sendNewMessage.click(() => {
+			console.log('Sending new message');
+			const message = $('#message').val()
+			const messageData = {
+				text: message,
+				chatRoomId: 'room:0502813f-d62a-4b37-b102-fe5db8b425a6',
+				senderId: 'kpan0021@student.monash.edu',
+				id: Date.now()
+			}
+			socket.emit('sendNewMessage', messageData)
+		})
+
+		fetchAllMessages.click(() => {
+			socket.emit('fetchAllMessages', { chatRoomId: 'room:0502813f-d62a-4b37-b102-fe5db8b425a6' })
 		})
 	})
 </script>
