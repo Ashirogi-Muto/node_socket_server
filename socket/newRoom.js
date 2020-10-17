@@ -40,13 +40,12 @@ const setupNewRoom = async ({ name, tag, userId, roomId }, socket) => {
 			if (isRoomAddedInList) {
 				await addUserToUserRoomList(userId, key)
 				socket.join(key, () => {
-					socket.to(key).emit('newRoomCreated', 'NEW ROOOOM CREATED!!!')
+					socket.to(key).emit('newRoomCreated', roomId)
 				})
 			}
 		}
-		return key
 	} catch (error) {
-		console.log(error);
+		throw error
 	}
 }
 

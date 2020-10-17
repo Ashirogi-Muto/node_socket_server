@@ -11,14 +11,17 @@ const initializeSocketMethods = io => {
 	io.on('connection', socket => {
 		console.log('a new connection detected', io.sockets.adapter.rooms)
 		socket.on('newRoom', async data => {
-			await newRoomSetup(data, socket)
+			try {
+				await newRoomSetup(data, socket)
+			} catch (error) {
+				socket.emit('newRoomCreationError', data)
+			}
 		})
 		socket.on('seeAllRooms', async () => {
 			try {
 				const rooms = await fetchAllRooms()
-				console.log(rooms);
 			} catch (error) {
-				socket.emit('newRoomCreationError', data)
+				socket.emit('fetchAllRoomsError', data)
 			}
 		})
 
@@ -29,7 +32,7 @@ const initializeSocketMethods = io => {
 				socket.emit('receiveNewMessage', data)
 			} catch (error) {
 				console.log(error);
-				socket.to(chatRoomId).emit('sendNewMessageError', data)
+				socket.emit('sendNewMessageError', data)
 			}
 		})
 
