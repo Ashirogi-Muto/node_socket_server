@@ -21,9 +21,12 @@ const {
  * @param {String} newRoomParams.userId Room Created By User ID
  * @param {*} socket Socket Object
  */
-const setupNewRoom = async ({ name, tag, userId }, socket) => {
+const setupNewRoom = async ({ name, tag, userId, roomId }, socket) => {
 	try {
-		const key = `${ROOM_PREFIX}${uuid()}`
+		if(!name || !tag || !userId || !roomId) {
+			throw Error('Missing required params')
+		}
+		const key = `${ROOM_PREFIX}${roomId}`
 		const newRoom = {
 			key,
 			name, tag, createdBy: userId,
@@ -32,13 +35,16 @@ const setupNewRoom = async ({ name, tag, userId }, socket) => {
 
 		const isNewRoomCreated = await addRoom(newRoom)
 
-		if(isNewRoomCreated) {
+		if (isNewRoomCreated) {
 			const isRoomAddedInList = await addRoomKeyInRoomList(key)
-			if(isRoomAddedInList) {
+			if (isRoomAddedInList) {
 				await addUserToUserRoomList(userId, key)
-				socket.join(key)
+				socket.join(key, () => {
+					socket.to(key).emit('newRoomCreated', 'NEW ROOOOM CREATED!!!')
+				})
 			}
 		}
+		return key
 	} catch (error) {
 		console.log(error);
 	}

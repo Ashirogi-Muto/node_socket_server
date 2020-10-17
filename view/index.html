@@ -54,21 +54,21 @@
 
 <body>
 	<button id="newRoom">Add a new room</button>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
+	<br />
+	<br />
+	<br />
+	<br />
 	<button id="testNewRoom">Test new room</button>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
+	<br />
+	<br />
+	<br />
+	<br />
 	<button id="seeRooms">See All Rooms</button>
 	<button id="fetchAllMessages">Fetch All Messages</button>
-	<br/>
-	<br/>
-	<br/>
-	<br/>
+	<br />
+	<br />
+	<br />
+	<br />
 
 	<ul id="messages"></ul>
 	<input id="message" autocomplete="off" />
@@ -79,9 +79,12 @@
 <script>
 	$(document).ready(() => {
 		const socket = io()
-
 		socket.on('receiveNewMessage', data => {
 			console.log('NEW MESSAGE', data);
+		})
+
+		socket.on('newRoomCreated', data => {
+			console.log('newRoomCreated', data);
 		})
 
 
