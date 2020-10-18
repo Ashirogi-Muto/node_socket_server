@@ -4,7 +4,8 @@ const addNewMessage = require('./addNewMessage')
 
 const {
 	fetchAllMessages,
-	fetchAllRooms
+	fetchAllRooms,
+	fetchUserRooms
 } = require('../redis')
 
 const initializeSocketMethods = io => {
@@ -17,17 +18,27 @@ const initializeSocketMethods = io => {
 				socket.emit('newRoomCreationError', data)
 			}
 		})
-		socket.on('seeAllRooms', async () => {
+		socket.on('fetchAllRooms', async userId => {
 			try {
+
 				const rooms = await fetchAllRooms()
+				socket.emit('receiveAllRooms', { rooms, userId })
 			} catch (error) {
 				socket.emit('fetchAllRoomsError', data)
 			}
 		})
 
+		socket.on('fetchUserRooms', async userId => {
+			try {
+				const userRooms = await fetchUserRooms(userId)
+				socket.emit('receiveUserRooms', { userRooms, userId })
+			} catch (error) {
+				socket.emit('fetchUserRoomsError', { userId })
+			}
+		})
+
 		socket.on('sendNewMessage', async data => {
 			try {
-				console.log(data);
 				addNewMessage(data)
 				socket.emit('receiveNewMessage', data)
 			} catch (error) {

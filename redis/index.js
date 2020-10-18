@@ -12,7 +12,7 @@ const {
 	MESSAGE_PREFIX,
 	ROOM_LIST_KEY,
 	ROOM_PREFIX,
-	USER_ROOMS_PREFIX,
+	USER_ROOMS_PREFIX
 } = require('../utils/constants')
 
 /**
@@ -115,7 +115,7 @@ const fetchAllMessages = async roomId => {
 		}
 		const roomMessageListkey = `${MESSAGE_PREFIX}${roomId}`
 		const roomMessageIds = await lrangeAsync(roomMessageListkey, 0, -1)
-		console.log(roomMessageIds);
+
 		if(roomMessageIds.length > 0) {
 			const fetchMessagesPromise = roomMessageIds.map(id => {
 				const messageKey = `${MESSAGE_PREFIX}${id}`
@@ -136,11 +136,7 @@ const fetchAllRooms = async () => {
 	try {
 		const rooms = await lrangeAsync(ROOM_LIST_KEY, 0, -1)
 		if(rooms.length > 0) {
-			const getRoomDetailsPromise = rooms.map(room => {
-				return hgetallAsync(room)
-			})
-			const allRoomsWithDetails = await Promise.all(getRoomDetailsPromise)
-			return allRoomsWithDetails
+			return await returnAllRoomsFromRoomList(rooms)
 		}
 		return []
 	} catch (error) {
@@ -162,6 +158,44 @@ const fetchUser = async id => {
 	
 }
 
+/**
+ * 
+ * @param {String} id 
+ */
+const fetchUserRooms = async id => {
+	try {
+		if(!id) {
+			throw new Error('Missing required input user id')
+		}
+		const key = `${USER_ROOMS_PREFIX}${id}`
+		const roomIdList = await lrangeAsync(key, 0, -1)
+
+		if(roomIdList.length > 0) {
+			return await returnAllRoomsFromRoomList(roomIdList)
+		}
+		return []
+	} catch (error) {
+		throw error
+	}
+}
+
+/**
+ * 
+ * @param {Array} roomList 
+ * @returns {Promise} roomArray
+ */
+const returnAllRoomsFromRoomList = async roomList => {
+	try {
+		const getRoomDetailsPromise = roomList.map(room => {
+			return hgetallAsync(room)
+		})
+		const allRoomsWithDetails = await Promise.all(getRoomDetailsPromise)
+		return allRoomsWithDetails
+	} catch (error) {
+		
+	}
+}
+
 
 module.exports = {
 	addMessage,
@@ -171,5 +205,6 @@ module.exports = {
 	addUserToUserRoomList,
 	fetchAllMessages,
 	fetchAllRooms,
-	fetchUser
+	fetchUser,
+	fetchUserRooms
 }

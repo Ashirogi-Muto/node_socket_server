@@ -70,6 +70,12 @@
 	<br />
 	<br />
 
+	<button id="fetchUserRooms">Fetch User Rooms</button>
+	<br />
+	<br />
+	<br />
+	<br />
+
 	<ul id="messages"></ul>
 	<input id="message" autocomplete="off" />
 	<button id="sendMessage">Send</button>
@@ -78,31 +84,42 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 	$(document).ready(() => {
+		const userId = 'kpan0021@student.monash.edu'
 		const socket = io()
 		socket.on('receiveNewMessage', data => {
 			console.log('NEW MESSAGE', data);
+		})
+
+		socket.on('receiveAllRooms', data => {
+			console.log('receiveAllRooms', data);
 		})
 
 		socket.on('newRoomCreated', data => {
 			console.log('newRoomCreated', data);
 		})
 
+		socket.on('receiveUserRooms', data => {
+			console.log('receiveUserRooms', data);
+		})
+
 
 		const newRoomButton = $('#newRoom')
 		const testRoomButton = $('#testNewRoom')
-		const seeAllRoomsButton = $('#seeRooms')
+		const fetchAllRoomsButton = $('#seeRooms')
 		const sendNewMessage = $('#sendMessage')
 		const fetchAllMessages = $('#fetchAllMessages')
+		const fetchUserRooms = $('#fetchUserRooms')
+
 
 		newRoomButton.click(() => {
 			console.log('NEW ROOM EMIT');
-			socket.emit('newRoom', { name: 'FIT5042', tag: 'unit', userId: 'kpan0021@student.monash.edu' })
+			socket.emit('newRoom', { name: 'FIT5042', tag: 'unit', userId })
 		})
 		testRoomButton.click(() => {
 			console.log('TEST ROOM EMIT');
 		})
-		seeAllRoomsButton.click(() => {
-			socket.emit('seeAllRooms')
+		fetchAllRoomsButton.click(() => {
+			socket.emit('fetchAllRooms', userId)
 		})
 		sendNewMessage.click(() => {
 			console.log('Sending new message');
@@ -118,6 +135,10 @@
 
 		fetchAllMessages.click(() => {
 			socket.emit('fetchAllMessages', { chatRoomId: 'room:0502813f-d62a-4b37-b102-fe5db8b425a6' })
+		})
+
+		fetchUserRooms.click(() => {
+			socket.emit('fetchUserRooms', userId)
 		})
 	})
 </script>
