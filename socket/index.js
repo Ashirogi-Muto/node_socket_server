@@ -1,46 +1,10 @@
 const onDisconnect = require('./disconnect')
-const newRoomSetup = require('./newRoom')
 const addNewMessage = require('./addNewMessage')
-
-const {
-	fetchAllMessages,
-	fetchAllRooms,
-	fetchUserRooms
-} = require('../redis')
 
 const initializeSocketMethods = io => {
 	io.on('connection', socket => {
 		// console.log('a new connection detected', io.sockets.adapter.rooms)
 		console.log('a new connection detected')
-
-		socket.on('newRoom', async data => {
-			try {
-				await newRoomSetup(data, socket)
-			} catch (error) {
-				console.log(error);
-				socket.emit('newRoomCreationError', data)
-			}
-		})
-		socket.on('fetchAllRooms', async data => {
-			const { userId } = data
-			try {
-
-				const rooms = await fetchAllRooms()
-				socket.emit('receiveAllRooms', { rooms, userId })
-			} catch (error) {
-				socket.emit('fetchAllRoomsError', data)
-			}
-		})
-
-		socket.on('fetchUserRooms', async data => {
-			const { userId } = data
-			try {
-				const userRooms = await fetchUserRooms(userId)
-				socket.emit('receiveUserRooms', { rooms: userRooms, userId })
-			} catch (error) {
-				socket.emit('fetchUserRoomsError', { userId })
-			}
-		})
 
 		socket.on('sendNewMessage', async data => {
 			try {
@@ -51,18 +15,6 @@ const initializeSocketMethods = io => {
 				socket.emit('sendNewMessageError', data)
 			}
 		})
-
-		socket.on('fetchAllMessages', async data => {
-			console.log('DETECTED fetchAllMessages');
-			try {
-				const { chatRoomId } = data
-				const messages = await fetchAllMessages(chatRoomId)
-				socket.emit('receiveNewMessage', messages)
-			} catch (error) {
-				console.log(error);
-			}
-		})
-
 		socket.on('disconnect', onDisconnect(socket))
 	})
 }
