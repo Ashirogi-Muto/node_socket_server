@@ -113,7 +113,7 @@
 
 		newRoomButton.click(() => {
 			console.log('NEW ROOM EMIT');
-			socket.emit('newRoom', { name: 'FIT5042', tag: 'unit', userId })
+			socket.emit('newRoom', { name: 'FIT5042', tag: 'unit', userId, roomId: Date.now() })
 		})
 		testRoomButton.click(() => {
 			console.log('TEST ROOM EMIT');

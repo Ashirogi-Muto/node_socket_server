@@ -17,6 +17,7 @@ const initializeSocketMethods = io => {
 			try {
 				await newRoomSetup(data, socket)
 			} catch (error) {
+				console.log(error);
 				socket.emit('newRoomCreationError', data)
 			}
 		})
