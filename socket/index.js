@@ -10,7 +10,9 @@ const {
 
 const initializeSocketMethods = io => {
 	io.on('connection', socket => {
-		console.log('a new connection detected', io.sockets.adapter.rooms)
+		// console.log('a new connection detected', io.sockets.adapter.rooms)
+		console.log('a new connection detected')
+
 		socket.on('newRoom', async data => {
 			try {
 				await newRoomSetup(data, socket)
@@ -18,7 +20,8 @@ const initializeSocketMethods = io => {
 				socket.emit('newRoomCreationError', data)
 			}
 		})
-		socket.on('fetchAllRooms', async userId => {
+		socket.on('fetchAllRooms', async data => {
+			const { userId } = data
 			try {
 
 				const rooms = await fetchAllRooms()
@@ -28,10 +31,11 @@ const initializeSocketMethods = io => {
 			}
 		})
 
-		socket.on('fetchUserRooms', async userId => {
+		socket.on('fetchUserRooms', async data => {
+			const { userId } = data
 			try {
 				const userRooms = await fetchUserRooms(userId)
-				socket.emit('receiveUserRooms', { userRooms, userId })
+				socket.emit('receiveUserRooms', { rooms: userRooms, userId })
 			} catch (error) {
 				socket.emit('fetchUserRoomsError', { userId })
 			}
