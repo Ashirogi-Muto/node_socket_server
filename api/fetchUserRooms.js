@@ -8,10 +8,9 @@ const fetchUserRooms = async (req, res, next) => {
 		}
 		const userRooms = await redisFunctions.fetchUserRooms(userId)
 		return res.status(200).json({
-			"message": 'success',
-			"result": {
-				"userId": userId,
-				"rooms": userRooms
+			message: 'success',
+			result: {
+				rooms: userRooms
 			}
 		})
 
