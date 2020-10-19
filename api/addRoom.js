@@ -31,7 +31,7 @@ const addRoom = async (req, res, next) => {
 		}
 
 		return res.status(200).json({
-			message: 'success'
+			"message": 'success'
 		})
 
 	} catch (error) {
