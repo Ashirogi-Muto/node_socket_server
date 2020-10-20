@@ -5,7 +5,7 @@ const fetchAllMessagesForARoom = async (req, res, next) => {
 		const { roomId } = req.params
 		const messages = await redisFunctions.fetchAllMessages(roomId)
 		return res.status(200).json({
-			messages: 'success',
+			message: 'success',
 			result: {
 				messages
 			}
