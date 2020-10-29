@@ -9,7 +9,7 @@ const initializeSocketMethods = io => {
 		socket.on('sendNewMessage', async data => {
 			try {
 				const result = await addNewMessage(data)
-				socket.emit('receiveNewMessage', result)
+				io.emit('receiveNewMessage', result)
 			} catch (error) {
 				console.log(error);
 				socket.emit('sendNewMessageError', data)
