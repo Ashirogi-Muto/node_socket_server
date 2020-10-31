@@ -7,6 +7,8 @@ const saddAsync = promisify(redisClient.SADD).bind(redisClient)
 const lpushAsync = promisify(redisClient.LPUSH).bind(redisClient)
 const lrangeAsync = promisify(redisClient.LRANGE).bind(redisClient)
 const smembersAsync = promisify(redisClient.SMEMBERS).bind(redisClient)
+const lremAsync = promisify(redisClient.LREM).bind(redisClient)
+
 
 const {
 	MESSAGE_PREFIX,
@@ -196,6 +198,20 @@ const returnAllRoomsFromRoomList = async roomList => {
 	}
 }
 
+/**
+ * 
+ * @param {String} userId 
+ * @param {String} roomId 
+ */
+const removeRoomIdFromUseRoomList = async (userId, roomId) => {
+	try {
+		const key = `${USER_ROOMS_PREFIX}${userId}`
+		await lremAsync(key, 0, roomId)
+	} catch (error) {
+		throw error
+	}
+}
+
 
 module.exports = {
 	addMessage,
@@ -206,5 +222,6 @@ module.exports = {
 	fetchAllMessages,
 	fetchAllRooms,
 	fetchUser,
-	fetchUserRooms
+	fetchUserRooms,
+	removeRoomIdFromUseRoomList
 }

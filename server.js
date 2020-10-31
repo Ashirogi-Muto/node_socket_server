@@ -9,6 +9,8 @@ const fetchUserRooms = require('./api/fetchUserRooms')
 const addRoom = require('./api/addRoom')
 const fetchAllRooms = require('./api/fetchAllRooms')
 const fetchAllMessagesForARoom = require('./api/fetchAllMessagesForARoom')
+const saveUserToRoom = require('./api/saveUserToRoom')
+const leaveRoom = require('./api/leaveRoom')
 
 app.use(cors())
 app.disable('x-powered-by')
@@ -25,6 +27,8 @@ app.get('/user-rooms/:userId', fetchUserRooms)
 app.get('/all-rooms/', fetchAllRooms)
 app.get('/all-messages/:roomId', fetchAllMessagesForARoom)
 app.post('/new-room', addRoom)
+app.post('/join-room/:roomId', saveUserToRoom)
+app.post('/leave-room/:roomId', leaveRoom)
 
 initializeSocketMethods(io)
 
