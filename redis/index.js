@@ -146,6 +146,15 @@ const fetchAllRooms = async () => {
 	}
 }
 
+const fetchRoomDetails = async roomId => {
+	try {
+		const roomDetails = await hgetallAsync(roomId)
+		return roomDetails
+	} catch (error) {
+		throw error
+	}
+}
+
 /**
  * 
  * @param {String} id User Id
@@ -221,6 +230,7 @@ module.exports = {
 	addUserToUserRoomList,
 	fetchAllMessages,
 	fetchAllRooms,
+	fetchRoomDetails,
 	fetchUser,
 	fetchUserRooms,
 	removeRoomIdFromUseRoomList
